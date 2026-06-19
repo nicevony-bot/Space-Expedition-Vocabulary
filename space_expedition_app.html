@@ -1,0 +1,1773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Space Expedition Vocabulary App</title>
+  <!-- Tailwind CSS for high-quality, modern utility classes and spacing -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    /* Cosmic Space Background Gradient */
+    .space-bg {
+      background: radial-gradient(circle at 50% 50%, #0c0a24 0%, #070913 60%, #020205 100%);
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Glowing Nebula Effects */
+    .nebula-purple {
+      filter: blur(140px);
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.2) 0%, rgba(0,0,0,0) 70%);
+    }
+
+    .nebula-blue {
+      filter: blur(140px);
+      background: radial-gradient(circle, rgba(14, 165, 233, 0.15) 0%, rgba(0,0,0,0) 70%);
+    }
+
+    /* Glassmorphism Panels for Space Cockpit Look */
+    .glass-hud {
+      background: rgba(10, 15, 30, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(99, 102, 241, 0.1);
+    }
+
+    /* Floating illustration animation */
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-8px) rotate(1.5deg); }
+    }
+    
+    .floating-element {
+      animation: float 6s ease-in-out infinite;
+    }
+
+    /* Gloop shaking animation */
+    @keyframes wiggle {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      25% { transform: scale(1.03) rotate(-1deg); }
+      75% { transform: scale(1.03) rotate(1deg); }
+    }
+    .wiggle-element {
+      animation: wiggle 2s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="space-bg text-slate-100 min-h-screen flex flex-col justify-between antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- Animated Space Starfield Canvas (Runs in Background) -->
+  <canvas id="space-starfield" class="absolute inset-0 pointer-events-none z-0"></canvas>
+  
+  <!-- Glowing Nebula Dust -->
+  <!-- --- HEADER (Always Predictable) --- -->
+  <header class="relative w-full max-w-5xl mx-auto px-6 py-5 flex items-center justify-between border-b border-indigo-500/20 z-10">
+    <div class="flex items-center gap-3">
+      <div class="p-2.5 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg shadow-indigo-500/30 animate-pulse">
+        <!-- Brand Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 2c0 0 3 4 3 9s-3 7-3 7-3-2-3-7 3-9 3-9z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 13H6l-1 4h4v-4zM15 13h3l1 4h-4v-4z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 18v3" />
+        </svg>
+      </div>
+      <div>
+        <h1 class="text-lg font-extrabold tracking-widest bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300 bg-clip-text text-transparent uppercase">Space Academy</h1>
+        <p class="text-[10px] font-black text-indigo-400 tracking-widest uppercase">Vocabulary Training Ship</p>
+      </div>
+    </div>
+
+    <!-- Predictable Home Button -->
+    <button onclick="goHome()" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900/80 hover:bg-indigo-950/80 transition-all text-xs font-black text-slate-200 border border-indigo-500/30 shadow-[0_0_15px_rgba(99,102,241,0.15)] hover:shadow-indigo-500/30">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+      </svg>
+      Home Base
+    </button>
+  </header>
+
+  <!-- --- PROGRESS BAR (Warp Charge Visual Helper) --- -->
+  <div id="progress-bar-container" class="relative w-full max-w-xl mx-auto px-6 mt-6 hidden z-10">
+    <div class="flex justify-between items-center mb-1.5">
+      <span class="text-xs font-extrabold text-slate-300 uppercase tracking-widest" id="progress-text">Warp Level: 0%</span>
+      <span class="text-xs font-black bg-indigo-500/20 text-indigo-300 px-2.5 py-0.5 rounded-full border border-indigo-500/30" id="card-counter">Word 1 of 20</span>
+    </div>
+    <div class="w-full bg-slate-950/80 rounded-full h-3.5 p-0.5 border border-indigo-500/20">
+      <div id="progress-bar" class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 h-2.5 rounded-full transition-all duration-300 w-0 shadow-[0_0_12px_rgba(139,92,246,0.7)]"></div>
+    </div>
+  </div>
+
+  <!-- --- MAIN PLAYGROUND --- -->
+  <main class="relative flex-1 flex items-center justify-center p-6 z-10">
+    <div class="w-full max-w-5xl transition-all duration-300">
+      
+      <!-- --- SCREEN 1: Welcome / Launcher Hub --- -->
+      <div id="screen-welcome" class="space-y-8 text-center max-w-4xl mx-auto py-4">
+        <div class="inline-block px-4 py-1.5 rounded-full bg-gradient-to-r from-indigo-500/15 to-pink-500/15 border border-indigo-500/30 text-xs font-black text-indigo-300 uppercase tracking-widest shadow-[0_0_15px_rgba(99,102,241,0.1)]">
+          🚀 Choose Your Space Activity
+        </div>
+        
+        <div class="space-y-3">
+          <h2 class="text-4xl md:text-6xl font-black tracking-tight leading-none text-white">
+            Space Exploration <br>
+            <span class="bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300 bg-clip-text text-transparent">Vocabulary Mission</span>
+          </h2>
+          <p class="text-sm md:text-base text-slate-300 max-w-xl mx-auto font-medium">
+            Learn and practice 20 awesome space words with simple pronunciation guides, visual matching, and fun quiz challenges!
+          </p>
+        </div>
+
+        <!-- Interactive Hub Selectors (Now includes 4 Activities!) -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 max-w-5xl mx-auto">
+          <!-- Activity 1: Study Cards -->
+          <div onclick="startExplorer()" class="group glass-hud p-5 rounded-2xl cursor-pointer hover:border-indigo-500/80 transition-all hover:scale-105 flex flex-col justify-between text-left space-y-4">
+            <div class="flex justify-between items-start">
+              <span class="text-3xl">🎴</span>
+              <span class="text-[9px] font-black uppercase text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/25">Level 1 - Learn</span>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-white group-hover:text-indigo-300 transition-colors">Card Explorer</h3>
+              <p class="text-[11px] text-slate-400 mt-1">Study words with colorful illustrations, sentences, and audio guides.</p>
+            </div>
+            <div class="text-xs font-extrabold text-indigo-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+              Launch Flight <span class="text-sm">→</span>
+            </div>
+          </div>
+
+          <!-- Activity 2: Laser Quiz -->
+          <div onclick="startQuiz()" class="group glass-hud p-5 rounded-2xl cursor-pointer hover:border-pink-500/80 transition-all hover:scale-105 flex flex-col justify-between text-left space-y-4">
+            <div class="flex justify-between items-start">
+              <span class="text-3xl">⚡</span>
+              <span class="text-[9px] font-black uppercase text-pink-400 bg-pink-500/10 px-2 py-0.5 rounded-full border border-pink-500/25">Level 2 - Quiz</span>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-white group-hover:text-pink-300 transition-colors">Laser Quiz</h3>
+              <p class="text-[11px] text-slate-400 mt-1">Zap space obstacles by choosing correct answers based on visual matching clues!</p>
+            </div>
+            <div class="text-xs font-extrabold text-pink-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+              Launch Flight <span class="text-sm">→</span>
+            </div>
+          </div>
+
+          <!-- Activity 3: Cosmic Matching -->
+          <div onclick="startMatch()" class="group glass-hud p-5 rounded-2xl cursor-pointer hover:border-emerald-500/80 transition-all hover:scale-105 flex flex-col justify-between text-left space-y-4">
+            <div class="flex justify-between items-start">
+              <span class="text-3xl">🧩</span>
+              <span class="text-[9px] font-black uppercase text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/25">Level 3 - Match</span>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-white group-hover:text-emerald-300 transition-colors">Cosmic Match</h3>
+              <p class="text-[11px] text-slate-400 mt-1">Pair space words directly to their definitions using visual guides.</p>
+            </div>
+            <div class="text-xs font-extrabold text-emerald-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+              Launch Flight <span class="text-sm">→</span>
+            </div>
+          </div>
+
+          <!-- NEW Activity 4: Gloop's Cosmic Diner -->
+          <div onclick="startFeed()" class="group glass-hud p-5 rounded-2xl cursor-pointer hover:border-lime-500/80 transition-all hover:scale-105 flex flex-col justify-between text-left space-y-4">
+            <div class="flex justify-between items-start">
+              <span class="text-3xl">👾</span>
+              <span class="text-[9px] font-black uppercase text-lime-400 bg-lime-500/10 px-2 py-0.5 rounded-full border border-lime-500/25">Level 4 - Funny</span>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-white group-hover:text-lime-300 transition-colors">Feed Gloop!</h3>
+              <p class="text-[11px] text-slate-400 mt-1">Feed a hungry, silly space alien the correct words to hear him chew and laugh!</p>
+            </div>
+            <div class="text-xs font-extrabold text-lime-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+              Open Diner <span class="text-sm">→</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- --- SCREEN 2: Card Explorer (Learn) --- -->
+      <div id="screen-card" class="hidden">
+        <div class="glass-hud rounded-3xl p-6 md:p-10 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center min-h-[460px]">
+          <!-- Left side visual support illustration -->
+          <div class="flex items-center justify-center p-6 bg-slate-950/75 rounded-2xl border border-indigo-500/20 aspect-square w-full max-w-xs md:max-w-none mx-auto relative overflow-hidden shadow-inner shadow-indigo-950">
+            <div class="absolute inset-0 opacity-15 bg-[radial-gradient(#6366f1_1px,transparent_1px)] [background-size:16px_16px]"></div>
+            <div id="card-image-container" class="relative w-full h-full text-indigo-400 flex items-center justify-center transition-transform duration-300 floating-element"></div>
+          </div>
+          
+          <!-- Right side phonetic & dictionary data -->
+          <div class="space-y-6 flex flex-col justify-center">
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-xs font-black text-indigo-300 tracking-widest uppercase">Galactic Dictionary</span>
+                <!-- Phonetic assist helper for A2 students -->
+                <span id="card-phonetic" class="text-[10px] font-bold text-pink-400 bg-pink-500/10 px-2 py-0.5 rounded border border-pink-500/20">pronunciation</span>
+              </div>
+              <h3 id="card-word" class="text-3xl md:text-5xl font-black text-white tracking-tight leading-none">Word</h3>
+            </div>
+            <div class="space-y-2">
+              <h4 class="text-xs font-black text-purple-300 uppercase tracking-wider">Scientific Meaning</h4>
+              <p id="card-definition" class="text-base md:text-lg text-slate-200 font-medium leading-relaxed">Definition</p>
+            </div>
+            <div class="p-5 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl space-y-2">
+              <h4 class="text-xs font-black text-pink-300 uppercase tracking-wider">Example Transmission</h4>
+              <p id="card-sentence" class="text-sm md:text-base text-slate-300 italic font-medium leading-relaxed">Sentence</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- --- SCREEN 3: Laser Quiz (Practice) --- -->
+      <div id="screen-quiz" class="hidden max-w-3xl mx-auto space-y-6">
+        <!-- Score and Multiplier tracker -->
+        <div class="glass-hud rounded-2xl p-4 flex justify-between items-center">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">⚡</span>
+            <span class="text-xs font-extrabold uppercase tracking-widest text-pink-400">Score Multiplier: <span id="quiz-score-val">0</span>/5</span>
+          </div>
+          <div class="text-xs font-bold text-slate-400 uppercase tracking-wider" id="quiz-progress-text">Question 1 of 5</div>
+        </div>
+
+        <!-- Question Box -->
+        <div class="glass-hud rounded-3xl p-6 md:p-8 space-y-6 relative overflow-hidden">
+          <div class="space-y-2">
+            <span class="text-xs font-black uppercase text-pink-400 tracking-widest block">Analyze definition coordinates:</span>
+            <h3 id="quiz-question-text" class="text-lg md:text-2xl font-black text-slate-100 leading-snug">Which coordinate represents this scenario?</h3>
+          </div>
+
+          <!-- Multiple choice laser selectors -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="quiz-options-container">
+            <!-- Loaded via JS -->
+          </div>
+          
+          <!-- Explanatory system feedback -->
+          <div id="quiz-explanation-box" class="hidden p-4 rounded-xl border border-indigo-500/20 bg-indigo-500/10 text-xs md:text-sm text-indigo-200">
+            <strong>Explanatory Entry:</strong> <span id="quiz-explanation-text">...</span>
+          </div>
+        </div>
+
+        <div class="flex justify-end">
+          <button id="btn-quiz-next" onclick="nextQuizQuestion()" class="hidden px-6 py-3 rounded-xl bg-gradient-to-r from-pink-500 to-indigo-500 hover:from-pink-400 text-white font-extrabold text-sm transition-all shadow-lg shadow-pink-500/25">
+            Next Destination
+          </button>
+        </div>
+      </div>
+
+      <!-- --- SCREEN 4: Cosmic Matching (Game) --- -->
+      <div id="screen-match" class="hidden space-y-6">
+        <div class="glass-hud rounded-2xl p-4 flex justify-between items-center max-w-3xl mx-auto">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">🧩</span>
+            <span class="text-xs font-extrabold uppercase tracking-widest text-emerald-400">Link terms to definitions! Match the words to lock screens.</span>
+          </div>
+          <button onclick="regenerateMatch()" class="px-3.5 py-1.5 rounded-lg bg-slate-900 border border-emerald-500/30 hover:bg-indigo-950 text-xs font-bold text-emerald-300 transition-all">
+            Shuffle Matrix
+          </button>
+        </div>
+
+        <!-- Interactive Match Area -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto items-stretch">
+          
+          <!-- Words (Terms) list -->
+          <div class="space-y-3 flex flex-col justify-center">
+            <h4 class="text-xs font-black text-indigo-300 uppercase tracking-widest pl-2">Terms (Click One)</h4>
+            <div id="match-words-col" class="space-y-3 flex-1 flex flex-col justify-center">
+              <!-- Loaded via JS -->
+            </div>
+          </div>
+
+          <!-- Definitions list -->
+          <div class="space-y-3 flex flex-col justify-center">
+            <h4 class="text-xs font-black text-purple-300 uppercase tracking-widest pl-2">Scientific Definitions</h4>
+            <div id="match-defs-col" class="space-y-3 flex-1 flex flex-col justify-center">
+              <!-- Loaded via JS -->
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- --- SCREEN 5: Gloop's Cosmic Diner (Funny Interactive Game) --- -->
+      <div id="screen-feed" class="hidden max-w-3xl mx-auto space-y-6">
+        <div class="glass-hud rounded-2xl p-4 flex justify-between items-center">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">👾</span>
+            <span class="text-xs font-extrabold uppercase tracking-widest text-lime-400">Gloop's Diner: Feed the hungry space alien!</span>
+          </div>
+          <div class="text-xs font-bold text-lime-300 uppercase tracking-wider" id="feed-score-val">Satiety level: 0/4</div>
+        </div>
+
+        <!-- Alien Interactive Screen -->
+        <div class="glass-hud rounded-3xl p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8 items-center relative overflow-hidden">
+          
+          <!-- Left side: Silly Interactive Alien SVG Graphic -->
+          <div class="flex flex-col items-center justify-center text-center space-y-4">
+            <div class="relative w-48 h-48 wiggle-element">
+              <svg id="gloop-svg" viewBox="0 0 120 120" class="w-full h-full transition-all duration-300">
+                <defs>
+                  <radialGradient id="gloopBody" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#a3e635" />
+                    <stop offset="70%" stop-color="#65a30d" />
+                    <stop offset="100%" stop-color="#3f6212" />
+                  </radialGradient>
+                  <radialGradient id="gloopEye" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#ffffff" />
+                    <stop offset="80%" stop-color="#e0f2fe" />
+                    <stop offset="100%" stop-color="#0284c7" />
+                  </radialGradient>
+                </defs>
+                <!-- Alien Shadows -->
+                <ellipse cx="60" cy="110" rx="35" ry="8" fill="#020617" opacity="0.6" />
+                
+                <!-- Alien Blob Body -->
+                <path d="M60 20 C35 20, 20 45, 20 75 C20 100, 35 105, 60 105 C85 105, 100 100, 100 75 C100 45, 85 20, 60 20 Z" fill="url(#gloopBody)" stroke="#a3e635" stroke-width="3" />
+                
+                <!-- Antennas -->
+                <path d="M45 23 L35 10" stroke="#a3e635" stroke-width="4" stroke-linecap="round"/>
+                <circle cx="35" cy="10" r="5" fill="#e11d48"/>
+                <path d="M75 23 L85 10" stroke="#a3e635" stroke-width="4" stroke-linecap="round"/>
+                <circle cx="85" cy="10" r="5" fill="#e11d48"/>
+
+                <!-- Three Cute Eyes -->
+                <circle cx="42" cy="45" r="11" fill="url(#gloopEye)" stroke="#1e3a8a" stroke-width="2"/>
+                <circle id="gloop-pupil-1" cx="42" cy="45" r="4.5" fill="#0f172a"/>
+
+                <circle cx="60" cy="38" r="14" fill="url(#gloopEye)" stroke="#1e3a8a" stroke-width="2"/>
+                <circle id="gloop-pupil-2" cx="60" cy="38" r="6" fill="#0f172a"/>
+
+                <circle cx="78" cy="45" r="11" fill="url(#gloopEye)" stroke="#1e3a8a" stroke-width="2"/>
+                <circle id="gloop-pupil-3" cx="78" cy="45" r="4.5" fill="#0f172a"/>
+
+                <!-- Blushing Cheeks -->
+                <circle cx="30" cy="72" r="5" fill="#e11d48" opacity="0.5" />
+                <circle cx="90" cy="72" r="5" fill="#e11d48" opacity="0.5" />
+
+                <!-- Giant Mouth (Controlled dynamically via state/JS) -->
+                <path id="gloop-mouth" d="M 40 70 Q 60 70 80 70" fill="none" stroke="#3f6212" stroke-width="5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            
+            <!-- Funny Alien Satiety Gauge -->
+            <div class="w-full max-w-[140px] bg-slate-950 p-1.5 rounded-full border border-lime-500/25">
+              <div id="gloop-belly-gauge" class="h-2 bg-lime-400 rounded-full transition-all duration-300 w-[0%] shadow-[0_0_8px_rgba(163,230,53,0.8)]"></div>
+            </div>
+          </div>
+
+          <!-- Right side: Gloop's simple dialog & snack choices -->
+          <div class="space-y-4 flex flex-col justify-center">
+            <!-- Gloop Speech Bubble -->
+            <div class="relative bg-lime-500/10 border-2 border-lime-500/40 p-4 rounded-2xl text-slate-100">
+              <div class="absolute left-6 -bottom-3.5 w-0 h-0 border-l-[12px] border-l-transparent border-t-[14px] border-t-lime-500/40 border-r-[12px] border-r-transparent"></div>
+              <p class="text-xs font-black uppercase text-lime-400 tracking-widest mb-1">👾 GLOOP SAYS:</p>
+              <h3 id="gloop-speech" class="text-sm md:text-base font-bold leading-relaxed text-slate-100">Me hungry! Feed me space things!</h3>
+            </div>
+
+            <!-- Delicious options container (Snacks) -->
+            <div class="space-y-2.5" id="gloop-options">
+              <!-- Loaded dynamically via JS -->
+            </div>
+          </div>
+
+        </div>
+
+        <div class="flex justify-end">
+          <button id="btn-feed-next" onclick="nextFeedTurn()" class="hidden px-6 py-3 rounded-xl bg-gradient-to-r from-lime-500 to-emerald-500 hover:from-lime-400 text-slate-950 font-black text-sm transition-all shadow-lg shadow-lime-500/20 uppercase tracking-wider">
+            Next Snack!
+          </button>
+        </div>
+      </div>
+
+      <!-- --- SCREEN 6: Universal Success/Completed --- -->
+      <div id="screen-success" class="hidden space-y-8 text-center max-w-3xl mx-auto py-6">
+        <div class="w-24 h-24 bg-gradient-to-tr from-emerald-500/20 to-teal-500/20 border border-emerald-500/40 text-emerald-300 rounded-full flex items-center justify-center mx-auto text-4xl shadow-2xl shadow-emerald-500/10 animate-bounce">
+          🏆
+        </div>
+        
+        <div class="space-y-3">
+          <h2 id="success-title" class="text-3xl md:text-5xl font-black text-white">Legendary Explorer Status!</h2>
+          <p id="success-description" class="text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
+            All systems complete! You successfully traveled the coordinates and fully decoded all 20 cosmic terms.
+          </p>
+        </div>
+
+        <!-- Mastered catalog grid -->
+        <div class="p-6 glass-hud rounded-2xl max-w-xl mx-auto">
+          <h3 class="text-xs font-black text-indigo-300 uppercase tracking-widest mb-4">Mastered Cosmic Database</h3>
+          <div id="mastered-words-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            <!-- Loaded dynamically via JS -->
+          </div>
+        </div>
+
+        <div>
+          <button onclick="goHome()" class="inline-flex items-center gap-3 px-6 py-3.5 bg-gradient-to-r from-indigo-500 to-pink-500 hover:from-indigo-400 hover:to-pink-400 active:scale-95 text-white font-extrabold text-sm rounded-xl transition-all shadow-lg shadow-indigo-500/25">
+            Return to Dashboard
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- --- FOOTER CONTROLS --- -->
+  <footer class="relative w-full max-w-5xl mx-auto px-6 py-6 border-t border-indigo-500/20 flex items-center justify-between z-10">
+    <div id="footer-left-content">
+      <button id="btn-back" onclick="handleBackAction()" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900/80 hover:bg-indigo-950/80 transition-all text-xs font-black text-slate-300 border border-indigo-500/20 shadow-md">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+        </svg>
+        <span>Back to Menu</span>
+      </button>
+    </div>
+
+    <div class="hidden sm:block text-[10px] text-indigo-400 font-mono tracking-widest opacity-80 uppercase">
+      ⚡ CAPTAIN HUD // AD-Astra.SYS
+    </div>
+
+    <div id="footer-right-content">
+      <button id="btn-next" onclick="handleNextAction()" class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-400 hover:to-pink-400 text-white transition-all text-xs font-black shadow-lg shadow-indigo-500/25 border border-indigo-300/25">
+        <span id="next-btn-text">Next Destination</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+    </div>
+  </footer>
+
+  <!-- --- JAVASCRIPT SYSTEM ENGINE --- -->
+  <script>
+    // Synthesizer Audio Engine - Enhanced for highly immersive sci-fi spatial feedback
+    const AudioEngine = {
+      ctx: null,
+      init() {
+        if (!this.ctx) {
+          this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+      },
+      play(type) {
+        this.init();
+        if (!this.ctx) return;
+        
+        const now = this.ctx.currentTime;
+        
+        if (type === 'click') {
+          // Futuristic Radar Console Blip using FM Modulation
+          const osc1 = this.ctx.createOscillator();
+          const osc2 = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          const modulation = this.ctx.createGain();
+
+          osc1.type = 'sine';
+          osc2.type = 'sine';
+          
+          osc1.frequency.setValueAtTime(800, now);
+          osc1.frequency.exponentialRampToValueAtTime(1200, now + 0.08);
+          
+          osc2.frequency.setValueAtTime(45, now);
+          modulation.gain.setValueAtTime(350, now);
+          
+          osc2.connect(modulation);
+          modulation.connect(osc1.frequency);
+          
+          osc1.connect(gain);
+          gain.connect(this.ctx.destination);
+          
+          gain.gain.setValueAtTime(0.04, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+          
+          osc1.start(now);
+          osc2.start(now);
+          osc1.stop(now + 0.1);
+          osc2.stop(now + 0.1);
+        } else if (type === 'correct') {
+          // Sweeping Star Energy Swell (glowing laser beam rising chord)
+          const osc = this.ctx.createOscillator();
+          const filter = this.ctx.createBiquadFilter();
+          const gain = this.ctx.createGain();
+
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(180, now);
+          osc.frequency.exponentialRampToValueAtTime(750, now + 0.4);
+
+          filter.type = 'bandpass';
+          filter.Q.setValueAtTime(12, now);
+          filter.frequency.setValueAtTime(200, now);
+          filter.frequency.exponentialRampToValueAtTime(4000, now + 0.4);
+
+          osc.connect(filter);
+          filter.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+
+          osc.start(now);
+          osc.stop(now + 0.4);
+        } else if (type === 'incorrect') {
+          // Resonant Shield Alarm Pulse (space-ship system alert)
+          const osc = this.ctx.createOscillator();
+          const lfo = this.ctx.createOscillator();
+          const modulation = this.ctx.createGain();
+          const gain = this.ctx.createGain();
+
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(160, now);
+          
+          lfo.frequency.setValueAtTime(16, now); // Pulsating alert vibration speed
+          modulation.gain.setValueAtTime(90, now);
+
+          lfo.connect(modulation);
+          modulation.connect(osc.frequency);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.linearRampToValueAtTime(0.08, now + 0.15);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+
+          osc.start(now);
+          lfo.start(now);
+          osc.stop(now + 0.5);
+          lfo.stop(now + 0.5);
+        } else if (type === 'nom') {
+          // Playful squelchy alien feeding space sound (bubbly chewing)
+          const notes = [320, 160, 420, 210, 520];
+          notes.forEach((freq, idx) => {
+            const osc = this.ctx.createOscillator();
+            const filter = this.ctx.createBiquadFilter();
+            const gain = this.ctx.createGain();
+
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now + (idx * 0.08));
+            osc.frequency.exponentialRampToValueAtTime(freq / 3, now + (idx * 0.08) + 0.06);
+
+            filter.type = 'lowpass';
+            filter.Q.setValueAtTime(9, now + (idx * 0.08));
+            filter.frequency.setValueAtTime(freq * 2, now + (idx * 0.08));
+            filter.frequency.exponentialRampToValueAtTime(freq, now + (idx * 0.08) + 0.06);
+
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(this.ctx.destination);
+
+            gain.gain.setValueAtTime(0.12, now + (idx * 0.08));
+            gain.gain.exponentialRampToValueAtTime(0.001, now + (idx * 0.08) + 0.07);
+
+            osc.start(now + (idx * 0.08));
+            osc.stop(now + (idx * 0.08) + 0.07);
+          });
+        } else if (type === 'victory') {
+          // Cosmic Synth Chord Arpeggios (majestic celestial scale)
+          const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50];
+          notes.forEach((freq, idx) => {
+            const osc = this.ctx.createOscillator();
+            const filter = this.ctx.createBiquadFilter();
+            const gain = this.ctx.createGain();
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + (idx * 0.09));
+            
+            filter.type = 'peaking';
+            filter.frequency.setValueAtTime(freq * 1.5, now + (idx * 0.09));
+
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(this.ctx.destination);
+
+            gain.gain.setValueAtTime(0.08, now + (idx * 0.09));
+            gain.gain.exponentialRampToValueAtTime(0.001, now + (idx * 0.09) + 0.7);
+
+            osc.start(now + (idx * 0.09));
+            osc.stop(now + (idx * 0.09) + 0.7);
+          });
+        }
+      }
+    };
+
+    // 20 Vocabulary Words with explicit phonetic helpers for A2 students
+    // CONSTELLATION emoji changed to sparkle constellation star configuration ✨
+    const vocabData = [
+      {
+        word: "Astronaut",
+        phonetic: "[ AS-truh-nawt ]",
+        emoji: "👨‍🚀",
+        definition: "A brave person who is trained to travel and work in outer space.",
+        sentence: "The astronaut floated gracefully outside the spaceship to fix a solar panel.",
+        svg: `<svg viewBox="0 0 120 120" class="w-48 h-48">
+          <defs>
+            <linearGradient id="astroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#38bdf8" />
+              <stop offset="100%" stop-color="#818cf8" />
+            </linearGradient>
+            <linearGradient id="visorGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#fbbf24" />
+              <stop offset="100%" stop-color="#f59e0b" />
+            </linearGradient>
+          </defs>
+          <circle cx="20" cy="30" r="1.5" fill="#fff" opacity="0.8"/>
+          <circle cx="100" cy="40" r="2" fill="#fff" opacity="0.6"/>
+          <rect x="25" y="35" width="70" height="60" rx="15" fill="#1e293b" stroke="#475569" stroke-width="3"/>
+          <rect x="30" y="40" width="10" height="25" rx="2" fill="#f43f5e"/>
+          <path d="M30 95C30 80, 90 80, 90 95V110H30V95Z" fill="url(#astroGrad)" stroke="#ffffff" stroke-width="3"/>
+          <rect x="42" y="88" width="36" height="12" rx="4" fill="#0f172a" stroke="#fff" stroke-width="1.5" />
+          <circle cx="50" cy="94" r="3" fill="#38bdf8"/>
+          <circle cx="60" cy="94" r="3" fill="#10b981"/>
+          <circle cx="70" cy="94" r="3" fill="#ef4444"/>
+          <circle cx="60" cy="55" r="32" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="3"/>
+          <circle cx="60" cy="55" r="28" fill="#334155" />
+          <path d="M36 50C36 40, 84 40, 84 50C84 62, 36 62, 36 50Z" fill="url(#visorGrad)" stroke="#fef08a" stroke-width="3"/>
+          <path d="M42 46C42 46, 55 42, 65 44" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/>
+        </svg>`
+      },
+      {
+        word: "Orbit",
+        phonetic: "[ AWR-bit ]",
+        emoji: "💫",
+        definition: "The curved path that an object in space takes around a star, planet, or moon.",
+        sentence: "The Earth takes 365 days to complete one orbit around the Sun.",
+        svg: `<svg viewBox="0 0 120 120" class="w-48 h-48">
+          <defs>
+            <linearGradient id="planetGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#06b6d4" />
+              <stop offset="100%" stop-color="#3b82f6" />
+            </linearGradient>
+            <linearGradient id="sunGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#f59e0b" />
+              <stop offset="100%" stop-color="#ef4444" />
+            </linearGradient>
+          </defs>
+          <circle cx="60" cy="60" r="18" fill="url(#sunGrad)" stroke="#fef08a" stroke-width="2" class="animate-pulse"/>
+          <ellipse cx="60" cy="60" rx="46" ry="18" fill="none" stroke="#6366f1" stroke-width="2.5" stroke-dasharray="6,4" transform="rotate(-20 60 60)"/>
+          <g transform="translate(60, 60) rotate(55)">
+            <circle cx="46" cy="0" r="8" fill="url(#planetGrad)" stroke="#fff" stroke-width="1.5"/>
+            <circle cx="46" cy="0" r="11" fill="none" stroke="#06b6d4" stroke-width="1" opacity="0.6"/>
+          </g>
+          <g transform="translate(60, 60) rotate(55)">
+            <ellipse cx="46" cy="0" rx="14" ry="5" fill="none" stroke="#e2e8f0" stroke-width="1" opacity="0.4" transform="rotate(25 46 0)"/>
+            <circle cx="56" cy="-2" r="2.5" fill="#f8fafc"/>
+          </g>
+        </svg>`
+      },
+      {
+        word: "Gravity",
+        phonetic: "[ GRAV-i-tee ]",
+        emoji: "🍏",
+        definition: "The invisible force that pulls objects toward each other and keeps our feet on the ground.",
+        sentence: "There is very little gravity on the moon, so astronauts can jump really high!",
+        svg: `<svg viewBox="0 0 120 120" class="w-48 h-48">
+          <defs>
+            <linearGradient id="gravityFloor" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#312e81" />
+              <stop offset="50%" stop-color="#4f46e5" />
+              <stop offset="100%" stop-color="#312e81" />
+            </linearGradient>
+            <linearGradient id="appleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#f43f5e" />
+              <stop offset="100%" stop-color="#be123c" />
+            </linearGradient>
+          </defs>
+          <ellipse cx="60" cy="95" rx="50" ry="12" fill="url(#gravityFloor)" stroke="#818cf8" stroke-width="2" />
+          <g stroke="#38bdf8" stroke-width="2" stroke-linecap="round" opacity="0.7">
+            <line x1="35" y1="45" x2="35" y2="75" />
+            <path d="M31 69L35 75L39 69" />
+            <line x1="85" y1="45" x2="85" y2="75" />
+            <path d="M81 69L85 75L89 69" />
+          </g>
+          <g transform="translate(0, -5)">
+            <circle cx="60" cy="45" r="14" fill="url(#appleGrad)" stroke="#fff" stroke-width="2"/>
+            <path d="M60 31C60 31, 58 24, 64 22" stroke="#22c55e" stroke-width="3" stroke-linecap="round"/>
+            <path d="M61 31H59" stroke="#fff" stroke-width="1"/>
+            <circle cx="55" cy="43" r="1.5" fill="#fff"/>
+            <circle cx="65" cy="43" r="1.5" fill="#fff"/>
+            <path d="M57 48C57 48, 60 51, 63 48" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+          </g>
+        </svg>`
+      },
+      {
+        word: "Cosmos",
+        phonetic: "[ KOZ-muhs ]",
+        emoji: "🌌",
+        definition: "The entire universe, including all stars, planets, space, and time.",
+        sentence: "When we look through a telescope, we are peering deep into the beautiful cosmos.",
+        svg: `<svg viewBox="0 0 120 120" class="w-48 h-48">
+          <defs>
+            <radialGradient id="cosmosDust" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#ec4899" stop-opacity="0.6"/>
+              <stop offset="40%" stop-color="#a855f7" stop-opacity="0.3"/>
+              <stop offset="100%" stop-color="#0000" />
+            </radialGradient>
+          </defs>
+          <circle cx="60" cy="60" r="45" fill="url(#cosmosDust)"/>
+          <path d="M60 20 L63 32 L75 35 L63 38 L60 50 L57 38 L45 35 L57 32 Z" fill="#fbbf24" stroke="#fff" stroke-width="1.5"/>
+          <circle cx="60" cy="35" r="2" fill="#fff"/>
+          <path d="M20 70C20 70, 45 95, 75 80C105 65, 100 40, 85 30" fill="none" stroke="#e0f2fe" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="35" cy="80" r="3" fill="#38bdf8"/>
+          <circle cx="85" cy="75" r="4" fill="#a855f7"/>
+          <circle cx="95" cy="48" r="2.5" fill="#f43f5e"/>
+          <circle cx="25" cy="45" r="2" fill="#10b981"/>
+        </svg>`
+      },
+      {
+        word: "Launch",
+        phonetic: "[ LAWNCH ]",
+        emoji: "🚀",
+        definition: "To send a rocket, spacecraft, or satellite into the air or into space.",
+        sentence: "Hundreds of people gathered to watch the rocket launch into the sky with a loud roar.",
+        svg: `<svg viewBox="0 0 120 120" class="w-48 h-48">
+          <defs>
+            <linearGradient id="rocketGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#f1f5f9" />
+              <stop offset="100%" stop-color="#cbd5e1" />
+            </linearGradient>
+            <linearGradient id="fireGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#fbbf24" />
+              <stop offset="50%" stop-color="#f97316" />
+              <stop offset="100%" stop-color="#ef4444" stop-opacity="0" />
+            </linearGradient>
+          </defs>
+          <line x1="25" y1="95" x2="95" y2="95" stroke="#475569" stroke-width="4" stroke-linecap="round"/>
+          <path d="M30 95V35L42 45M30 55H42" fill="none" stroke="#64748b" stroke-width="3"/>
+          <path d="M40 95C30 85, 45 70, 60 78C75 70, 90 85, 80 95Z" fill="url(#fireGrad)" opacity="0.9"/>
+          <path d="M48 95L60 70L72 95Z" fill="#fef08a" opacity="0.8"/>
+          <g transform="translate(20, -10)">
+            <path d="M40 15C40 15, 52 32, 52 55V82H28V55C28 32, 40 15, 40 15Z" fill="url(#rocketGrad)" stroke="#475569" stroke-width="2.5"/>
+            <path d="M28 70L16 82H28" fill="#ef4444" stroke="#475569" stroke-width="2"/>
+            <path d="M52 70L64 82H52" fill="#ef4444" stroke="#475569" stroke-width="2"/>
+            <circle cx="40" cy="45" r="6" fill="#38bdf8" stroke="#475569" stroke-width="2"/>
+            <path d="M42 42C42 42, 44 43, 44 45" stroke="#fff" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
+          </g>
+        </svg>`
+      },
+      {
+        word: "Galaxy",
+        phonetic: "[ GAL-uhk-see ]",
+        emoji: "🌀",
+        definition: "A giant group of billions of stars, gas, and dust held together by gravity.",
+        sentence: "Our solar system is located inside a spiral galaxy called the Milky Way.",
+        svg: `<svg viewBox="0 0 120 120" class="w-48 h-48">
+          <defs>
+            <radialGradient id="galaxyCore" cx="50%" cy="50%" r="40%">
+              <stop offset="0%" stop-color="#fffbeb" />
+              <stop offset="40%" stop-color="#fde047" />
+              <stop offset="100%" stop-color="#0000" />
+            </radialGradient>
+          </defs>
+          <ellipse cx="60" cy="60" rx="52" ry="24" fill="none" stroke="#6366f1" stroke-width="12" opacity="0.25" transform="rotate(-20 60 60)"/>
+          <ellipse cx="60" cy="60" rx="42" ry="18" fill="none" stroke="#ec4899" stroke-width="8" opacity="0.3" transform="rotate(-20 60 60)"/>
+          <circle cx="60" cy="60" r="14" fill="url(#galaxyCore)"/>
+          <path d="M60 60C75 45, 95 45, 105 55C115 65, 95 80, 80 80C65 80, 50 65, 45 55C40 45, 55 35, 70 35" fill="none" stroke="#c084fc" stroke-width="3" stroke-linecap="round"/>
+          <path d="M60 60C45 75, 25 75, 15 65C5 55, 25 40, 40 40C55 40, 70 55, 75 65C80 75, 65 85, 50 85" fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="100" cy="50" r="2" fill="#fff"/>
+          <circle cx="20" cy="70" r="1.5" fill="#fff"/>
+          <circle cx="45" cy="30" r="2" fill="#fde047"/>
+          <circle cx="75" cy="90" r="2.5" fill="#ec4899"/>
+        </svg>`
+      },
+      {
+        word: "Rocket",
+        phonetic: "[ ROK-it ]",
+        emoji: "🚀",
+        definition: "A powerful vehicle shaped like a tube that is used to travel into outer space.",
+        sentence: "The rocket flew faster than a jet plane to break through the Earth's atmosphere.",
+        svg: `<svg viewBox="0 0 120 120" class="w-48 h-48">
+          <defs>
+            <linearGradient id="rocketBodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ffffff" />
+              <stop offset="100%" stop-color="#e2e8f0" />
+            </linearGradient>
+          </defs>
+          <circle cx="30" cy="30" r="1.5" fill="#fde047"/>
+          <circle cx="95" cy="85" r="2" fill="#38bdf8"/>
+          <path d="M30 90L10 110L20 100Z" fill="#f97316"/>
+          <path d="M40 80L10 110L30 100" stroke="#f43f5e" stroke-width="4" stroke-linecap="round"/>
+          <g transform="translate(15, 15) rotate(45 40 40)">
+            <path d="M40 5C40 5, 54 22, 54 48V78H26V48C26 22, 40 5, 40 5Z" fill="url(#rocketBodyGrad)" stroke="#1e293b" stroke-width="3"/>
+            <path d="M40 5C40 5, 46 13, 52 20H28C34 13, 40 5, 40 5Z" fill="#ef4444" stroke="#1e293b" stroke-width="2"/>
+            <path d="M26 65L12 78H26" fill="#f43f5e" stroke="#1e293b" stroke-width="2.5"/>
+            <path d="M54 65L68 78H54" fill="#f43f5e" stroke="#1e293b" stroke-width="2.5"/>
+            <circle cx="40" cy="45" r="10" fill="#38bdf8" stroke="#1e293b" stroke-width="2.5"/>
+            <path d="M40 39 L42 43 L46 44 L43 47 L44 51 L40 49 L36 51 L37 47 L34 44 L38 43 Z" fill="#fde047" stroke="#ca8a04" stroke-width="0.5"/>
+          </g>
+        </svg>`
+      },
+      {
+        word: "Telescope",
+        phonetic: "[ TEL-uh-skohp ]",
+        emoji: "🔭",
+        definition: "A special tool shaped like a long tube that makes faraway stars and planets look closer.",
+        sentence: "Leo used his telescope to look at the craters on the moon from his backyard.",
+        svg: `<svg viewBox="0 0 120 120" class="w-48 h-48">
+          <defs>
+            <linearGradient id="scopeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#6366f1" />
+              <stop offset="100%" stop-color="#4f46e5" />
+            </linearGradient>
+          </defs>
+          <polygon points="100,20 102,25 108,25 103,28 105,33 100,30 95,33 97,28 92,25 98,25" fill="#fde047" stroke="#ca8a04" stroke-width="1"/>
+          <circle cx="100" cy="26" r="14" fill="none" stroke="#22d3ee" stroke-width="1.5" stroke-dasharray="3,3"/>
+          <line x1="50" y1="65" x2="30" y2="105" stroke="#475569" stroke-width="4" stroke-linecap="round"/>
+          <line x1="50" y1="65" x2="70" y2="105" stroke="#475569" stroke-width="4" stroke-linecap="round"/>
+          <line x1="50" y1="65" x2="50" y2="105" stroke="#334155" stroke-width="3" stroke-linecap="round"/>
+          <rect x="44" y="58" width="12" height="8" rx="2" fill="#cbd5e1" stroke="#475569" stroke-width="2"/>
+          <g transform="rotate(-30 50 50)">
+            <rect x="20" y="44" width="60" height="14" rx="2" fill="url(#scopeGrad)" stroke="#1e293b" stroke-width="3"/>
+            <rect x="79" y="41" width="6" height="20" rx="1.5" fill="#cbd5e1" stroke="#1e293b" stroke-width="2.5"/>
+            <path d="M82 43V59" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/>
+            <rect x="12" y="48" width="8" height="6" fill="#1e293b"/>
+            <rect x="6" y="46" width="6" height="10" rx="1" fill="#cbd5e1" stroke="#1e293b" stroke-width="2"/>
+          </g>
+        </svg>`
+      },
+      {
+        word: "Atmosphere",
+        phonetic: "[ AT-muhs-feer ]",
+        emoji: "🌍",
+        definition: "The invisible blanket of gases that surrounds a planet, like the air we breathe on Earth.",
+        sentence: "The Earth's atmosphere protects us from the hot rays of the sun.",
+        svg: `<svg viewBox="0 0 120 120" class="w-48 h-48">
+          <defs>
+            <linearGradient id="earthWater" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#0284c7" />
+              <stop offset="100%" stop-color="#0369a1" />
+            </linearGradient>
+            <radialGradient id="atmosGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="70%" stop-color="#38bdf8" stop-opacity="0.8" />
+              <stop offset="100%" stop-color="#38bdf8" stop-opacity="0" />
+            </radialGradient>
+          </defs>
+          <path d="M10 20L25 30M15 10L25 22M25 10L32 24" stroke="#f97316" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="60" cy="60" r="46" fill="url(#atmosGlow)" />
+          <circle cx="60" cy="60" r="40" fill="none" stroke="#e0f2fe" stroke-width="2.5" opacity="0.9"/>
+          <circle cx="60" cy="60" r="32" fill="url(#earthWater)" stroke="#0284c7" stroke-width="2"/>
+          <path d="M42 45C45 42, 50 48, 55 45C60 42, 65 48, 62 55C58 60, 50 55, 42 45Z" fill="#22c55e" />
+          <path d="M65 65C68 62, 75 62, 78 68C80 72, 72 78, 68 75C65 72, 62 68, 65 65Z" fill="#22c55e" />
+          <path d="M40 68C45 68, 48 72, 45 78C42 80, 38 75, 40 68Z" fill="#22c55e" />
+        </svg>`
+      },
+      {
+        word: "Meteorite",
+        phonetic: "[ MEE-tee-uh-ryt ]",
+        emoji: "☄️",
+        definition: "A rock from outer space that has passed through the atmosphere and landed on the ground.",
+        sentence: "The museum has a heavy, dark meteorite that crashed into the desert long ago.",
+        svg: `<svg viewBox="0 0 120 120" class="w-48 h-48">
+          <defs>
+            <linearGradient id="meteorBody" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#78716c" />
+              <stop offset="100%" stop-color="#44403c" />
+            </linearGradient>
+            <linearGradient id="tailGrad" x1="100%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#ef4444" />
+              <stop offset="50%" stop-color="#f97316" />
+              <stop offset="100%" stop-color="#f59e0b" stop-opacity="0" />
+            </linearGradient>
+          </defs>
+          <path d="M15 95C40 92, 80 92, 105 95" stroke="#1e293b" stroke-width="4" stroke-linecap="round"/>
+          <path d="M85 20L50 65L75 65Z" fill="url(#tailGrad)" opacity="0.8"/>
+          <line x1="95" y1="15" x2="65" y2="55" stroke="#ef4444" stroke-width="3" stroke-dasharray="4,4"/>
+          <circle cx="42" cy="78" r="14" fill="#cbd5e1" opacity="0.3"/>
+          <circle cx="72" cy="78" r="12" fill="#cbd5e1" opacity="0.3"/>
+          <path d="M42 62C48 55, 68 52, 74 65C78 74, 70 85, 58 82C48 80, 38 70, 42 62Z" fill="url(#meteorBody)" stroke="#1c1917" stroke-width="3"/>
+          <circle cx="50" cy="65" r="4" fill="#292524" />
+          <circle cx="62" cy="72" r="3.5" fill="#292524" />
+          <circle cx="55" cy="75" r="2" fill="#292524" />
+          <path d="M30 65L35 68" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+          <path d="M80 60L86 63" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+        </svg>`
+      },
+      {
+        word: "Nebula",
+        phonetic: "[ NEB-yuh-luh ]",
+        emoji: "🌌",
+        definition: "A giant, beautiful cloud of dust and gas in space where new stars are born.",
+        sentence: "The Orion Nebula looks like a colorful celestial painting through the space telescope.",
+        svg: `<svg viewBox="0 0 120 120" class="w-48 h-48">
+          <defs>
+            <radialGradient id="nebCenter" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#ec4899" />
+              <stop offset="50%" stop-color="#a855f7" stop-opacity="0.6"/>
+              <stop offset="100%" stop-color="#3b82f6" stop-opacity="0" />
+            </radialGradient>
+          </defs>
+          <circle cx="60" cy="60" r="45" fill="url(#nebCenter)"/>
+          <path d="M35 55C25 45, 55 25, 75 35C95 45, 95 75, 75 75C55 75, 45 65, 35 55Z" fill="#a855f7" fill-opacity="0.3" filter="blur(8px)"/>
+          <path d="M45 65C35 55, 65 45, 80 50C95 55, 85 85, 70 80C55 75, 55 75, 45 65Z" fill="#3b82f6" fill-opacity="0.4" filter="blur(6px)"/>
+          <polygon points="60,45 62,50 67,50 63,53 65,58 60,55 55,58 57,53 53,50 58,50" fill="#fff" stroke="#fde047" stroke-width="0.5"/>
+          <polygon points="40,65 41,68 45,68 42,70 43,73 40,71 37,73 38,70 35,68 39,68" fill="#fff" stroke="#fde047" stroke-width="0.5"/>
+          <polygon points="80,55 81,58 85,58 82,60 83,63 80,61 77,63 78,60 75,58 79,58" fill="#fff" stroke="#fde047" stroke-width="0.5"/>
+        </svg>`
+      },
+      {
+        word: "Constellation",
+        phonetic: "[ kon-stuh-LEY-shuhn ]",
+        emoji: "✨", // Bear emoji removed and changed to Sparkle Star ✨ as requested
+        definition: "A group of stars that form a recognizable picture or pattern in the night sky.",
+        sentence: "Sailors used to look at the Big Dipper constellation to find their way home.",
+        svg: `<svg viewBox="0 0 120 120" class="w-48 h-48">
+          <g stroke="#22d3ee" stroke-width="2" stroke-linecap="round" opacity="0.8">
+            <line x1="25" y1="35" x2="45" y2="40" />
+            <line x1="45" y1="40" x2="60" y2="55" />
+            <line x1="60" y1="55" x2="85" y2="60" />
+            <line x1="85" y1="60" x2="95" y2="85" />
+            <line x1="95" y1="85" x2="65" y2="90" />
+            <line x1="65" y1="90" x2="55" y2="65" />
+            <line x1="55" y1="65" x2="45" y2="40" />
+          </g>
+          <g fill="#fff">
+            <circle cx="25" cy="35" r="4.5" stroke="#06b6d4" stroke-width="2"/>
+            <circle cx="45" cy="40" r="4.5" stroke="#06b6d4" stroke-width="2"/>
+            <circle cx="60" cy="55" r="4.5" stroke="#06b6d4" stroke-width="2"/>
+            <circle cx="85" cy="60" r="5.5" stroke="#06b6d4" stroke-width="2" class="animate-pulse"/>
+            <circle cx="95" cy="85" r="4.5" stroke="#06b6d4" stroke-width="2"/>
+            <circle cx="65" cy="90" r="4.5" stroke="#06b6d4" stroke-width="2"/>
+            <circle cx="55" cy="65" r="4.5" stroke="#06b6d4" stroke-width="2"/>
+          </g>
+          <circle cx="35" cy="75" r="1" fill="#fff" opacity="0.5"/>
+          <circle cx="95" cy="30" r="1.5" fill="#fff" opacity="0.4"/>
+        </svg>`
+      },
+      {
+        word: "Comet",
+        phonetic: "[ KOM-it ]",
+        emoji: "☄️",
+        definition: "A chunk of ice, dust, and rock orbiting the sun, often with a long, glowing tail.",
+        sentence: "As the comet flew close to the sun, its icy tail lit up the night sky.",
+        svg: `<svg viewBox="0 0 120 120" class="w-48 h-48">
+          <defs>
+            <linearGradient id="cometTail" x1="100%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#06b6d4" />
+              <stop offset="60%" stop-color="#3b82f6" />
+              <stop offset="100%" stop-color="#6366f1" stop-opacity="0" />
+            </linearGradient>
+            <radialGradient id="cometHead" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#ffffff" />
+              <stop offset="50%" stop-color="#e0f2fe" />
+              <stop offset="100%" stop-color="#0284c7" />
+            </radialGradient>
+          </defs>
+          <path d="M35 85L105 20L80 50L95 80Z" fill="url(#cometTail)" opacity="0.8"/>
+          <path d="M40 75L110 35L85 60Z" fill="url(#cometTail)" opacity="0.5"/>
+          <circle cx="35" cy="80" r="16" fill="url(#cometHead)" stroke="#e0f2fe" stroke-width="2.5" />
+          <circle cx="35" cy="80" r="12" fill="none" stroke="#fff" stroke-width="1" stroke-dasharray="3,3"/>
+          <circle cx="42" cy="74" r="2.5" fill="#38bdf8"/>
+        </svg>`
+      },
+      {
+        word: "Satellite",
+        phonetic: "[ SAT-l-ayt ]",
+        emoji: "📡",
+        definition: "An object that circles a planet; can be natural like the moon, or human-made for weather and radio.",
+        sentence: "The weather satellite sends pictures of rain clouds back to scientists on Earth.",
+        svg: `<svg viewBox="0 0 120 120" class="w-48 h-48">
+          <defs>
+            <linearGradient id="panelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#3b82f6" />
+              <stop offset="100%" stop-color="#1d4ed8" />
+            </linearGradient>
+          </defs>
+          <path d="M45 35C45 35, 35 25, 25 28" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M40 30C40 30, 30 18, 18 22" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+          <g transform="translate(10, 10) rotate(35 45 45)">
+            <rect x="35" y="35" width="22" height="22" rx="4" fill="#cbd5e1" stroke="#475569" stroke-width="2.5"/>
+            <rect x="5" y="40" width="30" height="12" rx="2" fill="url(#panelGrad)" stroke="#1e293b" stroke-width="1.5"/>
+            <line x1="5" y1="46" x2="35" y2="46" stroke="#fff" stroke-width="1"/>
+            <rect x="57" y="40" width="30" height="12" rx="2" fill="url(#panelGrad)" stroke="#1e293b" stroke-width="1.5"/>
+            <line x1="57" y1="46" x2="87" y2="46" stroke="#fff" stroke-width="1"/>
+            <path d="M46 35V24" stroke="#475569" stroke-width="2.5"/>
+            <circle cx="46" cy="22" r="3" fill="#ef4444"/>
+          </g>
+        </svg>`
+      },
+      {
+        word: "Asteroid",
+        phonetic: "[ AS-tuh-roid ]",
+        emoji: "☄️",
+        definition: "A large, rocky object orbiting the sun that is smaller than a planet.",
+        sentence: "Many asteroids can be found floating in a giant ring between Mars and Jupiter.",
+        svg: `<svg viewBox="0 0 120 120" class="w-48 h-48">
+          <defs>
+            <linearGradient id="astBody" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#57534e" />
+              <stop offset="100%" stop-color="#292524" />
+            </linearGradient>
+          </defs>
+          <circle cx="20" cy="20" r="1" fill="#fff" opacity="0.6"/>
+          <path d="M22 65C24 62, 28 65, 26 68C24 70, 20 68, 22 65Z" fill="#78716c"/>
+          <path d="M85 30C87 28, 91 30, 89 33C87 35, 83 33, 85 30Z" fill="#78716c"/>
+          <path d="M60 20C75 16, 95 28, 98 48C101 68, 85 92, 60 96C35 100, 18 82, 22 55C26 28, 45 24, 60 20Z" fill="url(#astBody)" stroke="#1c1917" stroke-width="3.5" />
+          <g fill="#1c1917">
+            <circle cx="45" cy="40" r="7"/>
+            <circle cx="48" cy="41" r="5" fill="#44403c" opacity="0.5"/>
+            <circle cx="70" cy="50" r="9"/>
+            <circle cx="74" cy="52" r="7" fill="#44403c" opacity="0.5"/>
+            <circle cx="55" cy="75" r="6"/>
+            <circle cx="57" cy="76" r="4.5" fill="#44403c" opacity="0.5"/>
+          </g>
+        </svg>`
+      },
+      {
+        word: "Solar System",
+        phonetic: "[ SOH-ler SIS-tem ]",
+        emoji: "🪐",
+        definition: "The Sun and all the planets, moons, and other space objects that travel around it.",
+        sentence: "There are eight planets in our solar system, and Earth is the third one from the Sun.",
+        svg: `<svg viewBox="0 0 120 120" class="w-48 h-48">
+          <defs>
+            <radialGradient id="sunCentral" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#fef08a" />
+              <stop offset="40%" stop-color="#f97316" />
+              <stop offset="100%" stop-color="#ef4444" />
+            </radialGradient>
+          </defs>
+          <circle cx="60" cy="60" r="16" fill="url(#sunCentral)" stroke="#fbbf24" stroke-width="2" class="animate-pulse"/>
+          <ellipse cx="60" cy="60" rx="36" ry="16" fill="none" stroke="#475569" stroke-width="1.5" transform="rotate(-15 60 60)"/>
+          <g transform="translate(60,60) rotate(-15)">
+            <circle cx="36" cy="0" r="4" fill="#38bdf8" stroke="#1e293b" stroke-width="1"/>
+          </g>
+          <ellipse cx="60" cy="60" rx="52" ry="24" fill="none" stroke="#475569" stroke-width="1.5" transform="rotate(20 60 60)"/>
+          <g transform="translate(60,60) rotate(20)">
+            <circle cx="-52" cy="0" r="6" fill="#f59e0b" stroke="#1e293b" stroke-width="1"/>
+            <ellipse cx="-52" cy="0" rx="10" ry="3" fill="none" stroke="#fef08a" stroke-width="1" transform="rotate(15 -52 0)"/>
+          </g>
+        </svg>`
+      },
+      {
+        word: "Supernova",
+        phonetic: "[ soo-per-NOH-vuh ]",
+        emoji: "💥",
+        definition: "The spectacular, bright explosion of a dying star.",
+        sentence: "A supernova can briefly shine brighter than a whole galaxy of stars!",
+        svg: `<svg viewBox="0 0 120 120" class="w-48 h-48">
+          <defs>
+            <radialGradient id="supernovaCore" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#fff" />
+              <stop offset="30%" stop-color="#fde047" />
+              <stop offset="70%" stop-color="#ec4899" />
+              <stop offset="100%" stop-color="#3b82f6" stop-opacity="0" />
+            </radialGradient>
+          </defs>
+          <circle cx="60" cy="60" r="50" fill="url(#supernovaCore)"/>
+          <g stroke="#ffffff" stroke-width="2.5" stroke-linecap="round">
+            <line x1="60" y1="25" x2="60" y2="10" />
+            <line x1="60" y1="95" x2="60" y2="110" />
+            <line x1="25" y1="60" x2="10" y2="60" />
+            <line x1="95" y1="60" x2="110" y2="60" />
+          </g>
+          <g stroke="#fde047" stroke-width="2" stroke-linecap="round">
+            <line x1="35" y1="35" x2="20" y2="20" />
+            <line x1="85" y1="85" x2="100" y2="100" />
+            <line x1="85" y1="35" x2="100" y2="20" />
+            <line x1="35" y1="85" x2="20" y2="100" />
+          </g>
+          <circle cx="60" cy="60" r="28" fill="none" stroke="#a855f7" stroke-width="3" stroke-dasharray="8,4" />
+          <circle cx="60" cy="60" r="38" fill="none" stroke="#22d3ee" stroke-width="1.5" stroke-dasharray="4,8" />
+        </svg>`
+      },
+      {
+        word: "Eclipse",
+        phonetic: "[ i-KLIPS ]",
+        emoji: "🌑",
+        definition: "When one space object, like the moon, blocks the light of another space object, like the sun.",
+        sentence: "We wore special safety glasses to watch the solar eclipse turn the day dark.",
+        svg: `<svg viewBox="0 0 120 120" class="w-48 h-48">
+          <defs>
+            <radialGradient id="sunCorona" cx="50%" cy="50%" r="50%">
+              <stop offset="60%" stop-color="#fbbf24" stop-opacity="1" />
+              <stop offset="85%" stop-color="#f97316" stop-opacity="0.8" />
+              <stop offset="100%" stop-color="#ef4444" stop-opacity="0" />
+            </radialGradient>
+          </defs>
+          <circle cx="60" cy="60" r="48" fill="url(#sunCorona)"/>
+          <circle cx="60" cy="60" r="32" fill="#fff" opacity="0.3"/>
+          <circle cx="56" cy="60" r="32" fill="#090d16" stroke="#fbbf24" stroke-width="2.5" />
+          <circle cx="44" cy="48" r="4" fill="#1e293b" opacity="0.3"/>
+          <circle cx="48" cy="72" r="5" fill="#1e293b" opacity="0.3"/>
+          <circle cx="34" cy="62" r="3.5" fill="#1e293b" opacity="0.3"/>
+        </svg>`
+      },
+      {
+        word: "Light-year",
+        phonetic: "[ LAYT-yeer ]",
+        emoji: "💫",
+        definition: "The distance that light can travel in one Earth year—about 6 trillion miles!",
+        sentence: "The closest star system to us is about four light-years away.",
+        svg: `<svg viewBox="0 0 120 120" class="w-48 h-48">
+          <defs>
+            <linearGradient id="warpStream" x1="0%" y1="50%" x2="100%" y2="50%">
+              <stop offset="0%" stop-color="#ec4899" stop-opacity="0" />
+              <stop offset="80%" stop-color="#818cf8" />
+              <stop offset="100%" stop-color="#22d3ee" />
+            </linearGradient>
+          </defs>
+          <line x1="10" y1="35" x2="105" y2="35" stroke="url(#warpStream)" stroke-width="3" stroke-linecap="round"/>
+          <line x1="25" y1="60" x2="115" y2="60" stroke="url(#warpStream)" stroke-width="5" stroke-dasharray="40,10" stroke-linecap="round"/>
+          <line x1="15" y1="85" x2="100" y2="85" stroke="url(#warpStream)" stroke-width="3.5" stroke-linecap="round"/>
+          <circle cx="110" cy="48" r="1.5" fill="#fff" />
+          <circle cx="5" cy="70" r="2" fill="#fff" />
+          <polygon points="115,55 117,58 121,58 118,60 119,63 115,61 111,63 112,60 109,58 113,58" fill="#fde047" />
+        </svg>`
+      },
+      {
+        word: "Crater",
+        phonetic: "[ KREY-ter ]",
+        emoji: "🕳️",
+        definition: "A large, bowl-shaped hole in the ground caused by a space rock crash.",
+        sentence: "The moon's surface is covered in craters from billions of years of asteroid impacts.",
+        svg: `<svg viewBox="0 0 120 120" class="w-48 h-48">
+          <defs>
+            <linearGradient id="moonSurface" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#cbd5e1" />
+              <stop offset="100%" stop-color="#64748b" />
+            </linearGradient>
+          </defs>
+          <path d="M10 80C30 76, 50 64, 70 64C90 64, 100 76, 110 80" fill="none" stroke="#94a3b8" stroke-width="4" stroke-linecap="round"/>
+          <path d="M30 68C35 88, 65 88, 70 68" fill="#1e293b" stroke="#64748b" stroke-width="3" stroke-linecap="round"/>
+          <path d="M34 71C38 84, 62 84, 66 71" fill="#0f172a"/>
+          <path d="M82 72C84 78, 92 78, 94 72" fill="#334155" stroke="#64748b" stroke-width="1.5"/>
+          <circle cx="20" cy="74" r="2.5" fill="#94a3b8"/>
+          <circle cx="50" cy="85" r="1.5" fill="#94a3b8"/>
+          <circle cx="78" cy="65" r="3" fill="#cbd5e1"/>
+        </svg>`
+      }
+    ];
+
+    // Global State
+    let currentMode = 'menu'; // 'menu', 'explorer', 'quiz', 'match', 'feed', 'success'
+    let currentExplorerIdx = 0; // 0 to 19
+
+    // Quiz State
+    let quizQuestions = [];
+    let currentQuizIdx = 0;
+    let quizScore = 0;
+    let quizSelectedAns = null;
+
+    // Matching Game State
+    let matchSelection = { wordIdx: null, defIdx: null };
+    let matchLockedWords = [];
+    let matchLockedDefs = [];
+    let matchItems = { words: [], defs: [] };
+
+    // Gloop's Diner State (Funny Feed game!)
+    let feedTurnIdx = 0;
+    let feedScore = 0;
+    let feedOptions = [];
+    let feedTargetIdx = -1;
+    let feedIsActive = true;
+
+    // Gloop's humorous dialogue lists for A2 students
+    const gloopSuccessPhrases = [
+      "OM NOM NOM! Tastes like sweet space broccoli! More!",
+      "Yum! Me tummy loves science! Me want another snack!",
+      "GLURP! Yes! Now me can think with three brain cells!",
+      "Delicious! Me belly glows with cosmic knowledge! More!"
+    ];
+
+    const gloopFailurePhrases = [
+      "BLEH! That tastes like rusty rocket parts! Space tummy ache!",
+      "Phooey! Me wanted delicious definitions, not that!",
+      "Zorp! That gives Gloop hiccups! Try again!",
+      "BURP! Ouch, that did not go down well. Bad snack!"
+    ];
+
+    // Starfield Background Controls
+    let starfieldCanvas, starfieldCtx;
+    let starfieldStars = [];
+    let warpSpeedMultiplier = 1; // Used to accelerate star travel during next/start clicks
+
+    function initStarfield() {
+      starfieldCanvas = document.getElementById('space-starfield');
+      starfieldCtx = starfieldCanvas.getContext('2d');
+      
+      resizeStarfield();
+      window.addEventListener('resize', resizeStarfield);
+
+      // Create random star nodes with custom color palettes to replicate actual deep space
+      starfieldStars = [];
+      const count = 350; // Increased to 350 for massive star depth
+      const colors = ['#ffffff', '#bae6fd', '#fed7aa', '#fde047', '#e879f9', '#818cf8'];
+      for (let i = 0; i < count; i++) {
+        starfieldStars.push({
+          x: Math.random() * starfieldCanvas.width,
+          y: Math.random() * starfieldCanvas.height,
+          radius: Math.random() * 2.2 + 0.3, // Tiny dust particles mixed with bright stellar lights
+          speed: Math.random() * 0.12 + 0.04,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          alpha: Math.random(),
+          twinkleSpeed: Math.random() * 0.015 + 0.003
+        });
+      }
+
+      // Start animation loop
+      requestAnimationFrame(animateStarfield);
+    }
+
+    function resizeStarfield() {
+      if (starfieldCanvas) {
+        starfieldCanvas.width = window.innerWidth;
+        starfieldCanvas.height = window.innerHeight;
+      }
+    }
+
+    function animateStarfield() {
+      if (!starfieldCtx) return;
+      starfieldCtx.clearRect(0, 0, starfieldCanvas.width, starfieldCanvas.height);
+
+      starfieldStars.forEach(star => {
+        // Star movement drift (accelerated by warpSpeedMultiplier)
+        star.y += star.speed * warpSpeedMultiplier;
+        if (star.y > starfieldCanvas.height) {
+          star.y = 0;
+          star.x = Math.random() * starfieldCanvas.width;
+        }
+
+        // Shimmer twinkle
+        star.alpha += star.twinkleSpeed;
+        if (star.alpha > 1 || star.alpha < 0.1) {
+          star.twinkleSpeed = -star.twinkleSpeed;
+        }
+
+        starfieldCtx.beginPath();
+        starfieldCtx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        // Paint the colorful space stars
+        starfieldCtx.fillStyle = star.color;
+        starfieldCtx.globalAlpha = star.alpha;
+        starfieldCtx.fill();
+      });
+      
+      // Reset globalAlpha to avoid leaking onto other HTML templates
+      starfieldCtx.globalAlpha = 1.0;
+
+      // Gradually decay warp speed back to normal drift speed
+      if (warpSpeedMultiplier > 1) {
+        warpSpeedMultiplier -= 0.1;
+        if (warpSpeedMultiplier < 1) warpSpeedMultiplier = 1;
+      }
+
+      requestAnimationFrame(animateStarfield);
+    }
+
+    // Triggers "Warp Drive" visual effect when traveling space systems
+    function triggerWarpSpeed() {
+      warpSpeedMultiplier = 18;
+    }
+
+    window.onload = function() {
+      initStarfield();
+      goHome();
+    };
+
+    function goHome() {
+      currentMode = 'menu';
+      updateLayout();
+      AudioEngine.play('click');
+    }
+
+    // --- EXPLORER STUDY MODE ---
+    function startExplorer() {
+      triggerWarpSpeed();
+      currentMode = 'explorer';
+      currentExplorerIdx = 0;
+      updateLayout();
+      updateExplorerCard();
+      AudioEngine.play('victory');
+    }
+
+    function updateExplorerCard() {
+      const currentData = vocabData[currentExplorerIdx];
+      document.getElementById('card-word').innerText = currentData.word;
+      document.getElementById('card-phonetic').innerText = currentData.phonetic;
+      document.getElementById('card-definition').innerText = currentData.definition;
+      document.getElementById('card-sentence').innerText = currentData.sentence;
+      document.getElementById('card-image-container').innerHTML = currentData.svg;
+
+      // Progress bars
+      const percent = Math.round(((currentExplorerIdx) / 19) * 100);
+      document.getElementById('progress-bar').style.width = `${percent}%`;
+      document.getElementById('progress-text').innerText = `Warp Charge: ${percent}%`;
+      document.getElementById('card-counter').innerText = `Word ${currentExplorerIdx + 1} of 20`;
+    }
+
+    // --- QUIZ PRACTICE MODE ---
+    function startQuiz() {
+      triggerWarpSpeed();
+      currentMode = 'quiz';
+      currentQuizIdx = 0;
+      quizScore = 0;
+      generateQuizQuestions();
+      updateLayout();
+      loadQuizQuestion();
+      AudioEngine.play('victory');
+    }
+
+    function generateQuizQuestions() {
+      const indices = [];
+      while (indices.length < 5) {
+        const r = Math.floor(Math.random() * 20);
+        if (!indices.includes(r)) indices.push(r);
+      }
+      
+      quizQuestions = indices.map(idx => {
+        const correctItem = vocabData[idx];
+        const wrongOpts = [];
+        while (wrongOpts.length < 3) {
+          const r = Math.floor(Math.random() * 20);
+          if (r !== idx && !wrongOpts.includes(r)) {
+            wrongOpts.push(r);
+          }
+        }
+        
+        const choices = [idx, ...wrongOpts].sort(() => Math.random() - 0.5);
+        return {
+          correctIndex: idx,
+          choices: choices,
+          questionText: correctItem.definition
+        };
+      });
+    }
+
+    function loadQuizQuestion() {
+      quizSelectedAns = null;
+      document.getElementById('quiz-explanation-box').classList.add('hidden');
+      document.getElementById('btn-quiz-next').classList.add('hidden');
+      
+      const q = quizQuestions[currentQuizIdx];
+      document.getElementById('quiz-question-text').innerText = q.questionText;
+      document.getElementById('quiz-score-val').innerText = quizScore;
+      document.getElementById('quiz-progress-text').innerText = `Question ${currentQuizIdx + 1} of 5`;
+
+      const optContainer = document.getElementById('quiz-options-container');
+      optContainer.innerHTML = '';
+
+      q.choices.forEach(vocabIdx => {
+        const item = vocabData[vocabIdx];
+        const btn = document.createElement('button');
+        btn.id = `quiz-opt-${vocabIdx}`;
+        btn.className = "p-4 text-left rounded-xl border border-indigo-500/25 bg-slate-900/50 hover:bg-indigo-950/40 text-slate-100 font-bold transition-all hover:scale-[1.02] flex items-center justify-between";
+        btn.onclick = () => selectQuizAnswer(vocabIdx);
+        btn.innerHTML = `
+          <span class="flex items-center gap-2">🛸 ${item.emoji} ${item.word}</span>
+          <span class="text-xs text-indigo-400 opacity-0 group-hover:opacity-100">Shoot Target</span>
+        `;
+        optContainer.appendChild(btn);
+      });
+    }
+
+    function selectQuizAnswer(selectedIndex) {
+      if (quizSelectedAns !== null) return;
+      
+      quizSelectedAns = selectedIndex;
+      const q = quizQuestions[currentQuizIdx];
+      const correctIdx = q.correctIndex;
+
+      const optContainer = document.getElementById('quiz-options-container');
+      const buttons = optContainer.querySelectorAll('button');
+      
+      buttons.forEach(btn => {
+        btn.disabled = true;
+        btn.classList.remove('hover:bg-indigo-950/40', 'hover:scale-[1.02]');
+      });
+
+      if (selectedIndex === correctIdx) {
+        quizScore++;
+        document.getElementById(`quiz-opt-${selectedIndex}`).className = "p-4 text-left rounded-xl border border-emerald-500 bg-emerald-500/10 text-emerald-200 font-bold transition-all flex items-center justify-between shadow-[0_0_15px_rgba(16,185,129,0.3)]";
+        AudioEngine.play('correct');
+      } else {
+        document.getElementById(`quiz-opt-${selectedIndex}`).className = "p-4 text-left rounded-xl border border-red-500 bg-red-500/10 text-red-200 font-bold transition-all flex items-center justify-between shadow-[0_0_15px_rgba(239,68,68,0.3)]";
+        document.getElementById(`quiz-opt-${correctIdx}`).className = "p-4 text-left rounded-xl border border-emerald-500 bg-emerald-500/10 text-emerald-200 font-bold transition-all flex items-center justify-between shadow-[0_0_15px_rgba(16,185,129,0.3)] animate-pulse";
+        AudioEngine.play('incorrect');
+      }
+
+      document.getElementById('quiz-score-val').innerText = quizScore;
+      document.getElementById('quiz-explanation-text').innerText = `"${vocabData[correctIdx].word}" is correct! -> Pronunciation: ${vocabData[correctIdx].phonetic} -> "${vocabData[correctIdx].sentence}"`;
+      document.getElementById('quiz-explanation-box').classList.remove('hidden');
+      document.getElementById('btn-quiz-next').classList.remove('hidden');
+    }
+
+    function nextQuizQuestion() {
+      triggerWarpSpeed();
+      currentQuizIdx++;
+      if (currentQuizIdx < 5) {
+        loadQuizQuestion();
+      } else {
+        triggerSuccessScreen(
+          `Quiz Completed!`, 
+          `Excellent work, pilot! You successfully traveled the space matrix coordinates and hit ${quizScore} out of 5 targets.`
+        );
+      }
+    }
+
+    // --- COSMIC MATCH MODE ---
+    function startMatch() {
+      triggerWarpSpeed();
+      currentMode = 'match';
+      regenerateMatch();
+      updateLayout();
+      AudioEngine.play('victory');
+    }
+
+    function regenerateMatch() {
+      matchSelection = { wordIdx: null, defIdx: null };
+      matchLockedWords = [];
+      matchLockedDefs = [];
+
+      const selectionIndices = [];
+      while (selectionIndices.length < 4) {
+        const r = Math.floor(Math.random() * 20);
+        if (!selectionIndices.includes(r)) selectionIndices.push(r);
+      }
+
+      const shuffledWords = [...selectionIndices].sort(() => Math.random() - 0.5);
+      const shuffledDefs = [...selectionIndices].sort(() => Math.random() - 0.5);
+
+      matchItems.words = shuffledWords;
+      matchItems.defs = shuffledDefs;
+
+      renderMatchGrid();
+    }
+
+    function renderMatchGrid() {
+      const wordsCol = document.getElementById('match-words-col');
+      const defsCol = document.getElementById('match-defs-col');
+
+      wordsCol.innerHTML = '';
+      defsCol.innerHTML = '';
+
+      matchItems.words.forEach(idx => {
+        const item = vocabData[idx];
+        const isLocked = matchLockedWords.includes(idx);
+        const isSelected = matchSelection.wordIdx === idx;
+
+        const btn = document.createElement('button');
+        btn.disabled = isLocked;
+        btn.className = `w-full p-4 rounded-xl text-left font-bold transition-all border flex items-center justify-between ${
+          isLocked ? 'border-emerald-500/30 bg-emerald-500/5 text-emerald-400 opacity-60 cursor-default' :
+          isSelected ? 'border-indigo-400 bg-indigo-500/20 text-indigo-200 scale-95 shadow-[0_0_15px_rgba(99,102,241,0.25)]' :
+          'border-indigo-500/25 bg-slate-900/60 hover:bg-indigo-950/40 text-slate-100 hover:scale-[1.01]'
+        }`;
+        btn.innerHTML = `
+          <span>🛸 ${item.emoji} ${item.word}</span>
+          ${isLocked ? '<span>✔️</span>' : ''}
+        `;
+        btn.onclick = () => selectMatchWord(idx);
+        wordsCol.appendChild(btn);
+      });
+
+      matchItems.defs.forEach(idx => {
+        const item = vocabData[idx];
+        const isLocked = matchLockedDefs.includes(idx);
+        const isSelected = matchSelection.defIdx === idx;
+
+        const btn = document.createElement('button');
+        btn.disabled = isLocked;
+        btn.className = `w-full p-4 rounded-xl text-left text-xs md:text-sm font-medium transition-all border flex items-center gap-3 ${
+          isLocked ? 'border-emerald-500/30 bg-emerald-500/5 text-emerald-400 opacity-60 cursor-default' :
+          isSelected ? 'border-purple-400 bg-purple-500/20 text-purple-200 scale-95 shadow-[0_0_15px_rgba(168,85,247,0.25)]' :
+          'border-indigo-500/25 bg-slate-900/60 hover:bg-indigo-950/40 text-slate-200 hover:scale-[1.01]'
+        }`;
+        btn.innerHTML = `
+          <span class="flex-1 leading-snug">${item.definition}</span>
+          ${isLocked ? '<span>✔️</span>' : ''}
+        `;
+        btn.onclick = () => selectMatchDef(idx);
+        defsCol.appendChild(btn);
+      });
+    }
+
+    function selectMatchWord(idx) {
+      AudioEngine.play('click');
+      matchSelection.wordIdx = idx;
+      renderMatchGrid();
+      checkMatchMatch();
+    }
+
+    function selectMatchDef(idx) {
+      AudioEngine.play('click');
+      matchSelection.defIdx = idx;
+      renderMatchGrid();
+      checkMatchMatch();
+    }
+
+    function checkMatchMatch() {
+      const { wordIdx, defIdx } = matchSelection;
+      if (wordIdx === null || defIdx === null) return;
+
+      if (wordIdx === defIdx) {
+        matchLockedWords.push(wordIdx);
+        matchLockedDefs.push(defIdx);
+        matchSelection = { wordIdx: null, defIdx: null };
+        AudioEngine.play('correct');
+        renderMatchGrid();
+
+        if (matchLockedWords.length === 4) {
+          setTimeout(() => {
+            triggerSuccessScreen(
+              `Coordinates Equalized!`, 
+              `Flawless map alignment! You matched all planetary coordinates and successfully completed this system lock.`
+            );
+          }, 600);
+        }
+      } else {
+        AudioEngine.play('incorrect');
+        setTimeout(() => {
+          matchSelection = { wordIdx: null, defIdx: null };
+          renderMatchGrid();
+        }, 300);
+      }
+    }
+
+    // --- GLOOP'S COSMIC DINER (NEW ACTIVITY!) ---
+    function startFeed() {
+      triggerWarpSpeed();
+      currentMode = 'feed';
+      feedTurnIdx = 0;
+      feedScore = 0;
+      updateLayout();
+      loadFeedTurn();
+      AudioEngine.play('victory');
+    }
+
+    function loadFeedTurn() {
+      feedIsActive = true;
+      document.getElementById('btn-feed-next').classList.add('hidden');
+      
+      // Update Gloop's Satiety bar
+      const satietyPercentage = (feedScore / 4) * 100;
+      document.getElementById('gloop-belly-gauge').style.width = `${satietyPercentage}%`;
+      document.getElementById('feed-score-val').innerText = `Satiety level: ${feedScore}/4`;
+
+      // Reset Alien SVG expressions (Standard happy face, normal mouth curve)
+      document.getElementById('gloop-mouth').setAttribute('d', 'M 40 70 Q 60 85 80 70');
+      document.getElementById('gloop-mouth').setAttribute('stroke', '#3f6212');
+      document.getElementById('gloop-mouth').setAttribute('fill', 'none');
+
+      // Randomly select one correct target word
+      feedTargetIdx = Math.floor(Math.random() * 20);
+      const targetWord = vocabData[feedTargetIdx];
+
+      // Prepare Gloop dialogue bubbles
+      document.getElementById('gloop-speech').innerText = `ME TUMMY EMPTY! Feed Gloop: "${targetWord.definition}"`;
+
+      // Select 2 dummy words to go with the correct target word
+      const decoyIndices = [];
+      while (decoyIndices.length < 2) {
+        const rand = Math.floor(Math.random() * 20);
+        if (rand !== feedTargetIdx && !decoyIndices.includes(rand)) {
+          decoyIndices.push(rand);
+        }
+      }
+
+      // Merge and shuffle options
+      feedOptions = [feedTargetIdx, ...decoyIndices].sort(() => Math.random() - 0.5);
+
+      // Render Option Buttons as "Delicious Snacks"
+      const optContainer = document.getElementById('gloop-options');
+      optContainer.innerHTML = '';
+
+      feedOptions.forEach(idx => {
+        const item = vocabData[idx];
+        const btn = document.createElement('button');
+        btn.className = "w-full p-4 rounded-xl text-left font-black transition-all border border-lime-500/20 bg-slate-900/60 hover:bg-lime-950/20 text-slate-100 hover:scale-[1.02] flex items-center justify-between";
+        btn.innerHTML = `
+          <span class="flex items-center gap-2">🍪 ${item.emoji} ${item.word}</span>
+          <span class="text-xs text-lime-400 font-mono">FEED</span>
+        `;
+        btn.onclick = () => feedAlien(idx, btn);
+        optContainer.appendChild(btn);
+      });
+    }
+
+    function feedAlien(selectedIdx, btnElement) {
+      if (!feedIsActive) return;
+      feedIsActive = false;
+
+      // Disable all snacks
+      const buttons = document.getElementById('gloop-options').querySelectorAll('button');
+      buttons.forEach(btn => btn.disabled = true);
+
+      const speechBubble = document.getElementById('gloop-speech');
+      const mouth = document.getElementById('gloop-mouth');
+
+      if (selectedIdx === feedTargetIdx) {
+        // SUCCESS! Fed the correct thing!
+        feedScore++;
+        AudioEngine.play('nom'); // Playful eating sounds!
+        
+        // Update alien mouth to smile wide open & blush
+        mouth.setAttribute('d', 'M 40 70 Q 60 100 80 70 Z');
+        mouth.setAttribute('fill', '#ef4444');
+        mouth.setAttribute('stroke', '#3f6212');
+
+        // Funny randomized green alien response
+        const randomJoke = gloopSuccessPhrases[Math.floor(Math.random() * gloopSuccessPhrases.length)];
+        speechBubble.innerText = randomJoke;
+        
+        btnElement.className = "w-full p-4 rounded-xl text-left font-black transition-all border border-lime-400 bg-lime-500/20 text-lime-200 flex items-center justify-between shadow-[0_0_15px_rgba(163,230,53,0.4)]";
+      } else {
+        // INCORRECT! Fed wrong space card
+        AudioEngine.play('incorrect');
+
+        // Update alien mouth to sad frowny face
+        mouth.setAttribute('d', 'M 40 80 Q 60 65 80 80');
+        mouth.setAttribute('fill', 'none');
+        mouth.setAttribute('stroke', '#ef4444');
+
+        // Sad/funny reaction
+        const sadJoke = gloopFailurePhrases[Math.floor(Math.random() * gloopFailurePhrases.length)];
+        speechBubble.innerText = sadJoke;
+
+        btnElement.className = "w-full p-4 rounded-xl text-left font-black transition-all border border-rose-500 bg-rose-500/10 text-rose-300 flex items-center justify-between shadow-[0_0_15px_rgba(244,63,94,0.4)]";
+      }
+
+      // Update Satiety bar immediately
+      const satietyPercentage = (feedScore / 4) * 100;
+      document.getElementById('gloop-belly-gauge').style.width = `${satietyPercentage}%`;
+      document.getElementById('feed-score-val').innerText = `Satiety level: ${feedScore}/4`;
+
+      // Show the turn button
+      document.getElementById('btn-feed-next').classList.remove('hidden');
+    }
+
+    function nextFeedTurn() {
+      feedTurnIdx++;
+      if (feedTurnIdx < 4) {
+        loadFeedTurn();
+      } else {
+        // Complete the game!
+        if (feedScore >= 3) {
+          triggerSuccessScreen(
+            `Gloop is Full! 👾`, 
+            `A2 Mission Complete! You successfully fed Gloop ${feedScore} out of 4 correct meals. He is now sleeping happily under a nebula blanket!`
+          );
+        } else {
+          triggerSuccessScreen(
+            `Diner Closed!`, 
+            `You fed Gloop ${feedScore} correct items. He still has some empty tummies, but he sends cosmic thank you waves!`
+          );
+        }
+      }
+    }
+
+    // --- GLOBAL ROUTING ACTIONS ---
+    function triggerSuccessScreen(title, description) {
+      triggerWarpSpeed();
+      currentMode = 'success';
+      updateLayout();
+      AudioEngine.play('victory');
+      document.getElementById('success-title').innerText = title;
+      document.getElementById('success-description').innerText = description;
+
+      // Fill database
+      const grid = document.getElementById('mastered-words-grid');
+      grid.innerHTML = '';
+      vocabData.forEach(item => {
+        grid.innerHTML += `
+          <div class="px-3 py-2 bg-indigo-950/80 border border-indigo-500/30 rounded-xl text-center text-xs font-bold text-indigo-200 shadow-sm shadow-indigo-500/10 hover:scale-105 transition-all">
+            🚀 ${item.emoji} ${item.word}
+          </div>
+        `;
+      });
+    }
+
+    function handleBackAction() {
+      AudioEngine.play('click');
+      if (currentMode === 'explorer') {
+        if (currentExplorerIdx > 0) {
+          currentExplorerIdx--;
+          updateExplorerCard();
+        } else {
+          goHome();
+        }
+      } else {
+        goHome();
+      }
+    }
+
+    function handleNextAction() {
+      AudioEngine.play('click');
+      triggerWarpSpeed();
+      if (currentMode === 'explorer') {
+        if (currentExplorerIdx < 19) {
+          currentExplorerIdx++;
+          updateExplorerCard();
+        } else {
+          triggerSuccessScreen(
+            `Expedition Complete!`, 
+            `Legendary Explorer status unlocked! You traversed all 20 solar coordinate systems and learned how to pronounce and use them correctly.`
+          );
+        }
+      } else if (currentMode === 'quiz') {
+        nextQuizQuestion();
+      } else if (currentMode === 'match') {
+        regenerateMatch();
+      } else if (currentMode === 'feed') {
+        nextFeedTurn();
+      }
+    }
+
+    function updateLayout() {
+      document.getElementById('screen-welcome').classList.add('hidden');
+      document.getElementById('screen-card').classList.add('hidden');
+      document.getElementById('screen-quiz').classList.add('hidden');
+      document.getElementById('screen-match').classList.add('hidden');
+      document.getElementById('screen-feed').classList.add('hidden');
+      document.getElementById('screen-success').classList.add('hidden');
+      document.getElementById('progress-bar-container').classList.add('hidden');
+
+      const footerLeft = document.getElementById('footer-left-content');
+      const footerRight = document.getElementById('footer-right-content');
+      const nextBtnText = document.getElementById('next-btn-text');
+
+      footerLeft.classList.remove('opacity-0');
+      footerLeft.querySelector('button').disabled = false;
+      footerRight.classList.remove('opacity-0');
+      footerRight.querySelector('button').disabled = false;
+
+      if (currentMode === 'menu') {
+        document.getElementById('screen-welcome').classList.remove('hidden');
+        footerLeft.classList.add('opacity-0');
+        footerLeft.querySelector('button').disabled = true;
+        footerRight.classList.add('opacity-0');
+        footerRight.querySelector('button').disabled = true;
+
+      } else if (currentMode === 'explorer') {
+        document.getElementById('screen-card').classList.remove('hidden');
+        document.getElementById('progress-bar-container').classList.remove('hidden');
+        footerLeft.querySelector('span').innerText = "Abort Flight";
+        if (currentExplorerIdx === 19) {
+          nextBtnText.innerText = "Complete Mission";
+        } else {
+          nextBtnText.innerText = "Next Star Sector";
+        }
+
+      } else if (currentMode === 'quiz') {
+        document.getElementById('screen-quiz').classList.remove('hidden');
+        footerLeft.querySelector('span').innerText = "Back to Menu";
+        footerRight.classList.add('opacity-0');
+        footerRight.querySelector('button').disabled = true;
+
+      } else if (currentMode === 'match') {
+        document.getElementById('screen-match').classList.remove('hidden');
+        footerLeft.querySelector('span').innerText = "Back to Menu";
+        nextBtnText.innerText = "Shuffle Board";
+
+      } else if (currentMode === 'feed') {
+        document.getElementById('screen-feed').classList.remove('hidden');
+        footerLeft.querySelector('span').innerText = "Back to Menu";
+        footerRight.classList.add('opacity-0');
+        footerRight.querySelector('button').disabled = true;
+
+      } else if (currentMode === 'success') {
+        document.getElementById('screen-success').classList.remove('hidden');
+        footerLeft.classList.add('opacity-0');
+        footerLeft.querySelector('button').disabled = true;
+        footerRight.classList.add('opacity-0');
+        footerRight.querySelector('button').disabled = true;
+      }
+    }
+  </script>
+</body>
+</html>
